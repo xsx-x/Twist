@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מגזין טוויסט - המגזין שלך</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        twistRed: '#c0392b',
+                        twistOrange: '#e67e22',
+                        twistDark: '#2c3e50',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Rubik', sans-serif; }
+        .nav-active { border-bottom: 4px solid #c0392b; color: #c0392b; font-weight: bold; }
+        /* אנימציות עדינות לפופאפ */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- הלוגו -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="navigateTo('home')">
+                    <span class="text-4xl font-bold text-twistRed ml-2 tracking-tight">טוויסט</span>
+                    <i class="fa-solid fa-arrows-rotate text-twistOrange text-2xl"></i>
+                </div>
+                <!-- תפריט -->
+                <nav class="hidden md:flex space-x-reverse space-x-8 text-lg font-medium">
+                    <button onclick="navigateTo('home')" id="nav-home" class="nav-btn nav-active text-gray-600 hover:text-twistRed px-3 py-2 transition-colors">ראשי</button>
+                    <button onclick="navigateTo('articles')" id="nav-articles" class="nav-btn text-gray-600 hover:text-twistRed px-3 py-2 transition-colors">מדורים מרתקים</button>
+                    <button onclick="navigateTo('archive')" id="nav-archive" class="nav-btn text-gray-600 hover:text-twistRed px-3 py-2 transition-colors">ארכיון המגזין</button>
+                    <button onclick="navigateTo('about')" id="nav-about" class="nav-btn text-gray-600 hover:text-twistRed px-3 py-2 transition-colors">אודות ויצירת קשר</button>
+                </nav>
+                <!-- מובייל (המבורגר) -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-500 hover:text-twistRed focus:outline-none focus:text-twistRed p-2">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- תפריט מובייל נפתח -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+            <button onclick="navigateTo('home')" class="block w-full text-right px-4 py-3 text-gray-600 hover:bg-gray-50 border-b border-gray-100">ראשי</button>
+            <button onclick="navigateTo('articles')" class="block w-full text-right px-4 py-3 text-gray-600 hover:bg-gray-50 border-b border-gray-100">מדורים מרתקים</button>
+            <button onclick="navigateTo('archive')" class="block w-full text-right px-4 py-3 text-gray-600 hover:bg-gray-50 border-b border-gray-100">ארכיון המגזין</button>
+            <button onclick="navigateTo('about')" class="block w-full text-right px-4 py-3 text-gray-600 hover:bg-gray-50">אודות ויצירת קשר</button>
+        </div>
+    </header>
+
+    <!-- Side Banner (באנר קבוע בצד) -->
+    <div class="fixed left-0 top-1/3 transform -translate-y-1/2 w-32 bg-white shadow-xl border border-gray-200 rounded-r-lg z-30 hidden lg:block overflow-hidden transition-all duration-300 hover:w-40 hover:-translate-x-2">
+        <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&source=mailto&su=שלום,+אני+רוצה+לשמוע+פרטים+על+הצעת+שיווק+משתלמת!&to=shivuk.twist@gmail.com" target="_blank" class="block p-4 text-center hover:bg-red-50">
+            <h3 class="font-bold text-twistRed text-sm mb-2">פרסום משתלם!</h3>
+            <p class="text-xs text-gray-600 mb-3">פרסום וחשיפה במדיה הדיגיטלית</p>
+            <span class="inline-block bg-twistRed text-white text-xs px-3 py-1 rounded-full shadow hover:bg-red-700">הצעת פרסום</span>
+        </a>
+    </div>
+
+    <!-- Popup Banner (באנר קופץ) -->
+    <div id="popup-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center fade-in hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-11/12 md:w-full p-8 relative transform scale-95 transition-transform duration-300" id="popup-content">
+            <button onclick="closePopup()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-gift text-3xl text-twistRed"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">מבצע פרסום מיוחד!</h2>
+                <p class="text-gray-600 mb-6 text-lg">בעל עסק? כמה כסף כבר הוצאת על פרסום שלא הביא תוצאות? זה הזמן לפרסם אצלנו!</p>
+                <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&source=mailto&su=שלום,+אני+רוצה+לשמוע+פרטים+על+הצעת+שיווק+משתלמת!&to=shivuk.twist@gmail.com" target="_blank" onclick="closePopup()" class="inline-block bg-gradient-to-l from-twistRed to-red-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl hover:from-red-700 hover:to-red-600 transition-all text-lg">
+                    לפרטים והרשמה <i class="fa-solid fa-arrow-left mr-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen">
+
+        <!-- דף 1: כניסה לאתר - מגזין טוויסט -->
+        <section id="page-home" class="page-section fade-in">
+            <div class="bg-white rounded-3xl shadow-sm overflow-hidden mb-12">
+                <div class="bg-gradient-to-br from-red-50 to-white px-8 py-16 md:py-24 text-center border-b border-red-100">
+                    <h1 class="text-5xl md:text-7xl font-extrabold text-twistDark mb-6 tracking-tight">
+                        ברוכים הבאים ל<span class="text-twistRed">מגזין טוויסט</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+                        המגזין המרתק שלך עם שלל תכנים מעצימים, טיפים להתנהלות כלכלית, סיפורים בהמשכים והרבה יותר.
+                    </p>
+                    <button onclick="navigateTo('articles')" class="bg-twistRed text-white text-lg font-bold px-10 py-4 rounded-full shadow-lg hover:bg-red-700 hover:shadow-xl transition-all hover:-translate-y-1">
+                        היכנסו למדורים <i class="fa-solid fa-chevron-left ml-2"></i>
+                    </button>
+                </div>
+                <div class="p-8 grid md:grid-cols-3 gap-8 text-center">
+                    <div class="p-6 bg-red-50 rounded-2xl hover:shadow-md transition-shadow cursor-pointer" onclick="navigateTo('articles')">
+                        <i class="fa-solid fa-book-open text-4xl text-twistOrange mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">תוכן עשיר</h3>
+                        <p class="text-gray-600">כל תחומי העניין במקום אחד</p>
+                    </div>
+                    <div class="p-6 bg-orange-50 rounded-2xl hover:shadow-md transition-shadow cursor-pointer" onclick="navigateTo('archive')">
+                        <i class="fa-solid fa-box-archive text-4xl text-twistRed mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">ארכיון מלא</h3>
+                        <p class="text-gray-600">גישה קלה לכל גיליונות העבר</p>
+                    </div>
+                    <div class="p-6 bg-blue-50 rounded-2xl hover:shadow-md transition-shadow cursor-pointer" onclick="navigateTo('about')">
+                        <i class="fa-solid fa-envelope text-4xl text-twistDark mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">פניות וכתבות</h3>
+                        <p class="text-gray-600">אנו תמיד זמינים להערות ובקשות</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- דף 2: מדורים תחומי עניין מרתקים -->
+        <section id="page-articles" class="page-section hidden fade-in">
+            <div class="mb-10 text-center">
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4 border-b-4 border-twistRed inline-block pb-2">תחומי עניין מרתקים</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">המדורים מתעדכנים באופן אוטומטי. קריאה מהנה!</p>
+            </div>
+
+            <!-- תצוגת מדורים דינמית (מדמה טעינה מ-Google Sheets) -->
+            <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- הכרטיסיות יוזרקו לכאן דרך JavaScript -->
+            </div>
+        </section>
+
+        <!-- דף 3: ארכיון מגזינים (מתעדכן אוטומטית מדרייב) -->
+        <section id="page-archive" class="page-section hidden fade-in">
+            <div class="mb-10 text-center">
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4 border-b-4 border-twistOrange inline-block pb-2">ארכיון גיליונות</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">כאן תוכלו למצוא ולעיין בכל גיליונות העבר של המגזין, מרוכזים לנוחיותכם.</p>
+            </div>
+
+            <!-- תצוגת גיליונות -->
+            <div id="archive-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- הכרטיסיות יוזרקו לכאן דרך JavaScript -->
+            </div>
+        </section>
+
+        <!-- דף 4: אודות וקישורים -->
+        <section id="page-about" class="page-section hidden fade-in">
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm overflow-hidden">
+                <div class="p-10 border-b border-gray-100">
+                    <h2 class="text-4xl font-extrabold text-gray-800 mb-6 text-center">מי אנחנו?</h2>
+                    <p class="text-gray-600 text-lg mb-6 leading-relaxed">
+                        מגזין טוויסט הוקם במטרה להביא תוכן איכותי, מעצים ומעניין לכלל הקוראים שלנו. אנו מקפידים על כתיבה מרתקת המשלבת בין טיפול רגשי, ייעוץ כלכלי, מתכונים ועוד, הכל במעטפת אחת שכיף לקרוא.
+                    </p>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        בנוסף למהדורה הדיגיטלית, אנו דואגים לארכיון מסודר ולמערכת פניות שקופה ונגישה, על מנת לשמוע מכם - הקוראים שלנו.
+                    </p>
+                </div>
+
+                <div class="p-10 bg-gray-50">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-8 text-center">צרו איתנו קשר</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- קישור 1: לקבלת המגזין -->
+                        <a href="https://twist1.vercel.app/" target="_blank" class="flex items-center p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                            <div class="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center ml-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-paper-plane text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">לקבלת המגזין מידי שבוע</h4>
+                                <p class="text-sm text-gray-500">לחצו להרשמה (דרך Vercel)</p>
+                            </div>
+                        </a>
+
+                        <!-- קישור 2: להצעת פרסום -->
+                        <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&source=mailto&su=שלום,+אני+רוצה+לשמוע+פרטים+על+הצעת+שיווק+משתלמת!&to=shivuk.twist@gmail.com" target="_blank" class="flex items-center p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                            <div class="bg-red-100 text-twistRed w-12 h-12 rounded-full flex items-center justify-center ml-4 group-hover:bg-twistRed group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-bullhorn text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">להצעת פרסום</h4>
+                                <p class="text-sm text-gray-500">שיווק וחשיפה דיגיטלית</p>
+                            </div>
+                        </a>
+
+                        <!-- קישור 3: להערות והארות -->
+                        <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&source=mailto&su=שלום+רציתי+להעיר+/+להאיר+ולהציע&to=10think.aboutit@gmail.com" target="_blank" class="flex items-center p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                            <div class="bg-yellow-100 text-yellow-600 w-12 h-12 rounded-full flex items-center justify-center ml-4 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                                <i class="fa-regular fa-lightbulb text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">להערות והארות</h4>
+                                <p class="text-sm text-gray-500">נשמח לשמוע את דעתכם</p>
+                            </div>
+                        </a>
+
+                        <!-- קישור 4: לבקשות -->
+                        <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&source=mailto&su=שלום+רציתי+לבקש&to=10think.aboutit@gmail.com" target="_blank" class="flex items-center p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                            <div class="bg-green-100 text-green-600 w-12 h-12 rounded-full flex items-center justify-center ml-4 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-hand-holding-heart text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">לבקשות</h4>
+                                <p class="text-sm text-gray-500">בקשות מיוחדות מהמערכת</p>
+                            </div>
+                        </a>
+
+                        <!-- קישור 5: למדור קוראים כותבים -->
+                        <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&source=mailto&su=שלום,+רציתי+לומר+לכם&to=10think.aboutit@gmail.com" target="_blank" class="flex items-center p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 group md:col-span-2">
+                            <div class="bg-purple-100 text-purple-600 w-12 h-12 rounded-full flex items-center justify-center ml-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-pen-nib text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">למדור קוראים כותבים</h4>
+                                <p class="text-sm text-gray-500">שלחו אלינו טקסטים לפרסום במגזין</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-twistDark text-white py-8 border-t-4 border-twistRed text-center">
+        <p class="mb-4 text-lg">מגזין טוויסט &copy; כל הזכויות שמורות.</p>
+        <p class="text-sm text-gray-400">האתר פותח בהתאמה אישית לפריסה ב-GitHub Pages.</p>
+    </footer>
+
+    <!-- מערכת ה-JavaScript -->
+    <script>
+        // ----------------------------------------------------
+        // ניווט ותפריטים (SPA עדין)
+        // ----------------------------------------------------
+        const pages = ['home', 'articles', 'archive', 'about'];
+        
+        function navigateTo(targetPageId) {
+            // הסתרת כל הדפים והצגת המבוקש
+            pages.forEach(page => {
+                document.getElementById('page-' + page).classList.add('hidden');
+                document.getElementById('nav-' + page).classList.remove('nav-active');
+            });
+            document.getElementById('page-' + targetPageId).classList.remove('hidden');
+            document.getElementById('nav-' + targetPageId).classList.add('nav-active');
+            
+            // סגירת תפריט המובייל אם פתוח
+            document.getElementById('mobile-menu').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // תפריט מובייל
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+
+        // ----------------------------------------------------
+        // מערכת פופאפים ובאנרים
+        // ----------------------------------------------------
+        function closePopup() {
+            const popupOverlay = document.getElementById('popup-overlay');
+            const popupContent = document.getElementById('popup-content');
+            
+            popupContent.style.transform = 'scale(0.9)';
+            popupOverlay.style.opacity = '0';
+            
+            setTimeout(() => {
+                popupOverlay.classList.add('hidden');
+            }, 300);
+        }
+
+        // פתיחת הפופאפ המרכזי שניות ספורות אחרי עליית הדף
+        window.onload = function() {
+            setTimeout(() => {
+                const overlay = document.getElementById('popup-overlay');
+                overlay.classList.remove('hidden');
+                overlay.style.opacity = '1';
+                document.getElementById('popup-content').style.transform = 'scale(1)';
+            }, 3000); // קופץ אחרי 3 שניות
+            
+            // טעינת מידע פיקטיבי לדוגמה
+            loadMockArticles();
+            loadMockArchive();
+        };
+
+
+        // ----------------------------------------------------
+        // משיכת נתונים אוטומטית (Google Sheets & Drive)
+        // ----------------------------------------------------
+        
+        // --- 1. מדורים מ-Google Sheets ---
+        // הערה למפתח: כדי למשוך נתונים מגוגל שיטס, עליך לפרסם את המסמך שלך כ-CSV
+        // ולהשתמש בפקודת fetch לכתובת ה-CSV, ואז לפרסר את התוכן. 
+        // כאן הכנתי מערך דמה שתוכל להחליף בקלות ב-fetch אמיתי:
+        
+        function loadMockArticles() {
+            const articlesData = [
+                { title: "העצמה וטיפול רגשי", author: "הרב חנניה מנס", desc: "איך לא להתמכר לחדשות ולמסך – דווקא עכשיו? פתרונות להתמודדות במצב חירום.", icon: "fa-brain", color: "bg-teal-50 text-teal-700" },
+                { title: "התנהלות נכונה", author: "ארגון פעמונים", desc: "הסוד הגדול שאף אחד לא מספר לכם - איך לחסוך אלפי שקלים דווקא בעונת החגים.", icon: "fa-wallet", color: "bg-green-50 text-green-700" },
+                { title: "מדברים עסקים", author: "נחום ברוק", desc: "להרפות כדי להצליח: העיקרון שמפריד בין 'למה' ל'איך'. מעבר מהישרדות כלכלית לצמיחה.", icon: "fa-chart-line", color: "bg-blue-50 text-blue-700" },
+                { title: "הניצוץ היומי", author: "רעות", desc: "יש רגעים כאלה, שבהם את מרגישה בכל הגוף שמשהו חייב להצליח. אבל האמת...", icon: "fa-star", color: "bg-yellow-50 text-yellow-700" },
+                { title: "מתכונים מנצחים", author: "מערכת המגזין", desc: "פנקייקים מהירים ורכים למלווה מלכה. מתכון קליל שכל אחד יכול להכין ולהנות.", icon: "fa-utensils", color: "bg-orange-50 text-orange-700" },
+                { title: "מדור AI הדסים", author: "הדסה בלוי", desc: "תמונות עוצרות נשימה שנוצרו באמצעות בינה מלאכותית, עם התייחסות לאמונה וביטחון.", icon: "fa-robot", color: "bg-purple-50 text-purple-700" },
+                { title: "כל הדרכים (פרק 58)", author: "שרי רובל - סיפור בהמשכים", desc: "מימי נוסעת לירושלים ואבא שלה שומע שהיא מדברת עם יקי בקשר לחיפושים אחרי בעלה של שובל...", icon: "fa-book", color: "bg-pink-50 text-pink-700" }
+            ];
+
+            const grid = document.getElementById('articles-grid');
+            
+            articlesData.forEach(item => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="${item.color} w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid ${item.icon} text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">${item.title}</h3>
+                        <p class="text-sm text-twistRed font-medium mb-4">מאת: ${item.author}</p>
+                        <p class="text-gray-600 leading-relaxed">${item.desc}</p>
+                        <button class="mt-6 text-sm font-bold text-twistDark border-b-2 border-transparent hover:border-twistDark pb-1 transition-all">קרא עוד <i class="fa-solid fa-arrow-left text-xs mr-1"></i></button>
+                    </div>
+                `;
+            });
+        }
+
+        // --- 2. ארכיון מ-Google Drive ---
+        // הערה למפתח: ניתן למשוך רשימת קבצים בעזרת Google Drive API (דורש API Key)
+        // או לשמור רשימה פשוטה בגיליון אקסל (כמו במדורים) שמפנה לקבצי ה-PDF ששמורים בדרייב.
+        
+        function loadMockArchive() {
+            const archiveGrid = document.getElementById('archive-grid');
+            // יוצר 10 גיליונות לדוגמה אחורנית
+            for(let i = 85; i >= 76; i--) {
+                const date = new Date(2024, 3, i*3).toLocaleDateString('he-IL'); // תאריך רנדומלי לדוגמה
+                archiveGrid.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group cursor-pointer text-center">
+                        <div class="h-32 bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition-colors">
+                            <i class="fa-solid fa-file-pdf text-5xl text-gray-400 group-hover:text-twistRed transition-colors"></i>
+                        </div>
+                        <div class="p-4 border-t border-gray-50">
+                            <h4 class="font-bold text-gray-800">גיליון ${i}</h4>
+                            <p class="text-xs text-gray-500 mt-1">${date}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
